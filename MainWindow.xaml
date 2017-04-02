@@ -1,0 +1,357 @@
+﻿<Window
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    xmlns:esri="http://schemas.esri.com/arcgis/client/2009"
+    x:Class="NoiseMapper.MainWindow"
+    Title="Noise Mapper"
+    WindowStartupLocation="CenterScreen"
+    WindowState="Maximized"
+    Icon="Images\NoiseMapper.ico">
+
+
+    <Grid x:Name="LayoutRoot">
+        <Grid.Resources>
+
+            <esri:Editor x:Key="editor"
+                         LayerIDs="calcAreas, sources"
+                         ScaleEnabled="False"
+                         RotateEnabled="False"
+                         AutoSelect="True"
+                         EditVerticesEnabled="False" 
+                         GeometryServiceUrl="http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer"/>
+            <!--Map="{Binding ElementName=map}"-->
+        </Grid.Resources>
+
+        <esri:Map x:Name="map"
+                  UseAcceleratedDisplay="False"
+                  Loaded="map_Loaded">
+            <!--esri:Editor.SnapDistance="10"-->
+            <esri:Map.Extent>
+                <esri:Envelope XMin="1545542.03999566"
+                               YMin="6269393.43927059"
+                               XMax="2743035.99205583"
+                               YMax="7329985.66495551" >
+                    <!--1992 <esri:Envelope XMin="170756" YMin="134128" XMax="863200" YMax="774651" >-->
+                    <!--<esri:Envelope.SpatialReference>
+                        <esri:SpatialReference WKID="2180"/>
+                    </esri:Envelope.SpatialReference>-->
+                </esri:Envelope>
+            </esri:Map.Extent>
+
+            <esri:ArcGISTiledMapServiceLayer ID="basemap"
+                                             Url="http://services.arcgisonline.com/ArcGIS/rest/services/World_Topo_Map/MapServer"/>
+
+            <esri:AcceleratedDisplayLayers>
+                <esri:GraphicsLayer ID="results"
+                                    Opacity="0.5"
+                                    DisplayName="Noise Level [dB]"/>
+            </esri:AcceleratedDisplayLayers>
+
+            <esri:FeatureLayer ID="calcAreas"
+                               Url="http://services3.arcgis.com/D6PwCWESS0GIeW55/arcgis/rest/services/calc_area/FeatureServer/0"
+                               ValidateEdits="True"
+                               Mode="OnDemand"
+                               AutoSave="False"
+                               DisableClientCaching="True"/>
+
+            <esri:FeatureLayer ID="sources"
+                               Url="http://services3.arcgis.com/D6PwCWESS0GIeW55/arcgis/rest/services/sources/FeatureServer/0"
+                               OutFields="*"
+                               ValidateEdits="True"
+                               Mode="OnDemand"
+                               AutoSave="False"
+                               DisableClientCaching="True"
+                               MouseLeftButtonUp="FeatureLayer_MouseLeftButtonUp"/>
+        </esri:Map>
+
+
+        <ComboBox x:Name="basemapComboBox"
+                  Grid.Column="1"
+                  Width="150"
+                  Height="100"
+                  Margin="0,10,10,0" 
+                  HorizontalAlignment="Right"
+                  VerticalAlignment="Top"
+                  SelectedIndex="0"
+                  ToolTip="Choose basemap..."
+                  ScrollViewer.VerticalScrollBarVisibility="Disabled"
+                  SelectionChanged="basemapComboBox_SelectionChanged"
+                  MaxDropDownHeight="600">
+
+            <ComboBox.Effect>
+                <DropShadowEffect ShadowDepth="1"/>
+            </ComboBox.Effect>
+
+            <ComboBox.Resources>
+                <Style x:Key="basemapComboBoxItem" TargetType="ComboBoxItem">
+                    <Setter Property="Width" Value="150"/>
+                    <Setter Property="BorderBrush" Value="#FFACACAC"/>
+                </Style>
+                <Style x:Key="basemapImage" TargetType="Image">
+                    <Setter Property="Height" Value="100"/>
+                </Style>
+            </ComboBox.Resources>
+
+            <ComboBoxItem Style="{StaticResource basemapComboBoxItem}"
+                          Tag="http://services.arcgisonline.com/arcgis/rest/services/World_Topo_Map/MapServer">
+                <Image Style="{StaticResource basemapImage}"
+                       Source="Images/topographic.jpg"
+                       ToolTip="Topographic"/>
+            </ComboBoxItem>
+
+            <ComboBoxItem Style="{StaticResource basemapComboBoxItem}"
+                          Tag="http://services.arcgisonline.com/ArcGIS/rest/services/World_Street_Map/MapServer">
+                <Image Style="{StaticResource basemapImage}"
+                       Source="Images/streets.jpg"
+                       ToolTip="Streets"/>
+            </ComboBoxItem>
+
+            <ComboBoxItem Style="{StaticResource basemapComboBoxItem}"
+                          Tag="http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Reference/MapServer;http://services.arcgisonline.com/ArcGIS/rest/services/Canvas/World_Light_Gray_Base/MapServer">
+                <Image Style="{StaticResource basemapImage}"
+                       Source="Images/light_gray_canvas.jpg"
+                       ToolTip="Light Gray Canvas"/>
+            </ComboBoxItem>
+
+            <ComboBoxItem Style="{StaticResource basemapComboBoxItem}"
+                          Tag="http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer">
+                <Image Style="{StaticResource basemapImage}"
+                       Source="Images/imagery.jpg"
+                       ToolTip="Imagery"/>
+            </ComboBoxItem>
+
+            <ComboBoxItem Style="{StaticResource basemapComboBoxItem}"
+                          Tag="http://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Boundaries_and_Places/MapServer;http://services.arcgisonline.com/ArcGIS/rest/services/Reference/World_Transportation/MapServer;http://services.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer">
+                <Image Style="{StaticResource basemapImage}"
+                       Source="Images/imagery_hybrid.jpg"
+                       ToolTip="Imagery with Labels"/>
+            </ComboBoxItem>
+        </ComboBox>
+
+
+        <ProgressBar x:Name="progressBar"
+                     Width="150"
+                     Height="15"
+                     HorizontalAlignment="Center"
+                     VerticalAlignment="Center" 
+                     Visibility="Collapsed"
+                     Opacity="0"
+                     Foreground="DodgerBlue">
+        </ProgressBar>
+
+
+        <!--<Label x:Name="label" Content="" HorizontalAlignment="Right" Margin="0,132,10,0" VerticalAlignment="Top" Height="124" Width="136" Background="#FFF1C8C8"/>-->
+
+
+        <Border Background="White"
+                BorderThickness="1"
+                HorizontalAlignment="Left"
+                VerticalAlignment="Top"
+                Width="200"
+                Margin="10,10,0,0">
+            <Border.Effect>
+                <DropShadowEffect ShadowDepth="1" />
+            </Border.Effect>
+
+            <StackPanel>
+                <TextBlock Text="Input data"
+                            FontWeight="Bold"
+                            TextWrapping="Wrap" 
+                            Padding="5"/>
+
+                <TextBlock Text="Add Point Source and set parameters."
+                           TextWrapping="Wrap" 
+                           Padding="5"/>
+
+                <esri:TemplatePicker HorizontalAlignment="Center"
+                                    VerticalAlignment="Top"
+                                    Map="{Binding ElementName=map}" 
+                                    LayerIDs="sources"
+                                    ShowAttributesOnAdd="True"
+                                    GeometryServiceUrl="http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer"/>
+
+                <TextBlock Text="Add at least one rectangular Calculation Area."
+                           TextWrapping="Wrap" 
+                           Padding="5"/>
+
+                <esri:TemplatePicker HorizontalAlignment="Center"
+                                     VerticalAlignment="Top"
+                                     Map="{Binding ElementName=map}" 
+                                     LayerIDs="calcAreas"
+                                     ShowAttributesOnAdd="False"
+                                     GeometryServiceUrl="http://tasks.arcgisonline.com/ArcGIS/rest/services/Geometry/GeometryServer">
+                </esri:TemplatePicker>
+
+                <TextBlock Text="Optionally, edit features or change grid settings and simply run calculation!"
+                           TextWrapping="Wrap" 
+                           Padding="5,5,5,0"/>
+
+                <TextBlock Text="If nothing appears try use less grid points."
+                           TextWrapping="Wrap"
+                           FontStyle="Italic"
+                           Foreground="DarkGray"
+                           Padding="5,0,5,5"/>
+
+                <Button Width="40"
+                        Height="40"
+                        ToolTip="Run Calculation"
+                        BorderBrush="DarkGray"
+                        Click="runButton_Click">
+                    <Polygon VerticalAlignment="Center"
+                             HorizontalAlignment="Center"
+                             Points="0,0 0,22 19.05,11"
+                             Fill="Black" />
+                </Button>
+
+
+                <Expander Padding="5">
+                    <Expander.Header>
+                        <TextBlock Text="Edit data" FontWeight="Bold" ToolTip="Edit features..."/>
+                    </Expander.Header>
+                    <Grid DataContext="{StaticResource editor}">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <Button Content="Select" Command="{Binding Select}" CommandParameter="New"
+                                Grid.Column="0" Grid.Row="0"/>
+                        <Button Content="Move feature" Command="{Binding EditVertices}"
+                                Grid.Column="1" Grid.Row="0"/>
+
+                        <Button Content="Clear Selection" Command="{Binding ClearSelection}"
+                                Grid.Column="0" Grid.Row="1"/>
+                        <Button Content="Delete Selected" Command="{Binding DeleteSelected}"
+                                Grid.Column="1" Grid.Row="1"/>
+
+                        <Button Content="Save" Command="{Binding Save}"
+                                FontWeight="Bold"
+                                Grid.Column="0" Grid.Row="2"/>
+                        <Button Content="Cancel" Click="cancelEditsButton_Click"
+                                FontWeight="Bold"
+                                Grid.Column="1" Grid.Row="2"/>
+                    </Grid>
+                </Expander>
+
+
+                <Expander Padding="5">
+                    <Expander.Header>
+                        <TextBlock Text="Settings" FontWeight="Bold" ToolTip="Change grid settings..."/>
+                    </Expander.Header>
+
+                    <Grid>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="4*"/>
+                            <ColumnDefinition Width="3*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition/>
+                            <RowDefinition/>
+                        </Grid.RowDefinitions>
+
+                        <Label Content="Grid Height [m]:"
+                               Grid.Row="0"
+                               Grid.Column="0"/>
+                        <TextBox x:Name="gridHeightTextBox"
+                                 Grid.Row="0"
+                                 Grid.Column="1"
+                                 Text="4"
+                                 ToolTip="Height above ground level for calculation points"
+                                 HorizontalContentAlignment="Right"
+                                 VerticalContentAlignment="Center"/>
+
+                        <!--<Label Content="Grid Size [m]:"
+                               Grid.Row="0"
+                               Grid.Column="2"/>
+                        <TextBox x:Name="gridSizeTextBox"
+                                 Grid.Row="0"
+                                 Grid.Column="3"
+                                 Text="10"
+                                 ToolTip="Fixed distance beetwen calculation points"
+                                 HorizontalContentAlignment="Center"
+                                 VerticalContentAlignment="Center"/>-->
+
+
+                        <Label Content="Grid Points:"
+                               Grid.Row="1"
+                               Grid.Column="0"/>
+                        <ComboBox x:Name="gridCountComboBox"
+                                  Grid.Row="1"
+                                  Grid.Column="1"
+                                  ToolTip="Number of grid points inside calculation area"
+                                  HorizontalContentAlignment="Right"
+                                  VerticalContentAlignment="Center">
+                            <ComboBoxItem Content="1 000"/>
+                            <ComboBoxItem Content="5 000"/>
+                            <ComboBoxItem Content="10 000"/>
+                            <ComboBoxItem Content="50 000"/>
+                            <ComboBoxItem Content="100 000" IsSelected="True"/>
+                            <ComboBoxItem Content="500 000"/>
+                            <ComboBoxItem Content="1 000 000"/>
+                        </ComboBox>
+
+                    </Grid>
+                </Expander>
+            </StackPanel>
+        </Border>
+
+
+        <esri:Legend LayerIDs="results"
+                     Map="{Binding ElementName=map}"
+                     Margin="10,0,0,10"
+                     Width="150"
+                     HorizontalAlignment="Left"
+                     VerticalAlignment="Bottom"
+                     Background="White"
+                     ToolTip="Legend">
+
+            <esri:Legend.Effect>
+                <DropShadowEffect ShadowDepth="1"/>
+            </esri:Legend.Effect>
+
+            <esri:Legend.MapLayerTemplate>
+                <DataTemplate>
+                    <StackPanel Margin="5">
+                        <TextBlock Text="{Binding Label}"
+                                   FontWeight="Bold"/>
+                        <Slider Maximum="1"
+                                Value="{Binding Layer.Opacity, Mode=TwoWay}"
+                                LargeChange="0.1"
+                                SmallChange="0.05"/>
+                    </StackPanel>
+                </DataTemplate>
+            </esri:Legend.MapLayerTemplate>
+        </esri:Legend>
+
+
+        <Grid HorizontalAlignment="Right"
+              VerticalAlignment="Bottom"
+              ToolTip="Edit source attributes...">
+
+            <Border Background="White"
+                    BorderThickness="1"
+                    Padding="5">
+                <Border.Effect>
+                    <DropShadowEffect ShadowDepth="1"/>
+                </Border.Effect>
+            </Border>
+
+            <Expander Background="White"
+                      Padding="5">
+                <Expander.Header>
+                    <TextBlock Text="Sources - Attribute Table"
+                               FontWeight="Bold"/>
+                </Expander.Header>
+
+                <esri:FeatureDataGrid x:Name="featureDataGrid"/>
+            </Expander>
+        </Grid>
+
+    </Grid>
+</Window>
