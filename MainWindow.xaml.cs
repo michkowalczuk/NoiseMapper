@@ -13,7 +13,6 @@ using esriSymbols = ESRI.ArcGIS.Client.Symbols;
 
 using NoiseMapper.Model;
 
-
 namespace NoiseMapper
 {
     /// <summary>
