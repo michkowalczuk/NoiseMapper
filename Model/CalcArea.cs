@@ -2,6 +2,9 @@
 
 namespace NoiseMapper.Model
 {
+    /// <summary>
+    /// Class for calculation area
+    ///</summary>
     class CalcArea : ModelObject
     {
         public CalcArea(esriGeometry.Polygon polygon)

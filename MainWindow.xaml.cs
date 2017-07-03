@@ -62,9 +62,6 @@ namespace NoiseMapper
 
             // standard range from 35 do 85 dB
             double minValue = 30;
-            //double maxValue = 85;
-            //double breakCount = Math.Ceiling((maxValue - minValue) / dBRange);
-            //Random random;
             for (int iClass = 0; iClass < 11; iClass++)
             {
                 ClassBreakInfo classBreakInfo = new ClassBreakInfo();
@@ -144,40 +141,10 @@ namespace NoiseMapper
 
 
         #region EVENTS
-        //private void OnModelPrepared(object sender)
-        //{
-        //    progressBar.Dispatcher.BeginInvoke(new Action(() =>
-        //    {
-        //        progressBar.IsIndeterminate = false;
-        //    }));
-        //}
-
         // update from different thread
         private void OnProgressIncremented(object sender, int progress)
         {
-            //progressBar.Dispatcher.BeginInvoke(new Action(() =>
-            //    {
-            //        progressBar.Value = progress;
-
-            //        if (progressBar.Value < 10)
-            //        {
-            //            progressBar.Opacity = progress / 10.0;
-            //        }
-            //        else if (progressBar.Value > 90)
-            //        {
-            //            progressBar.Opacity = (100 - progress) / 10.0;
-            //        }
-            //        else
-            //        {
-            //            progressBar.Opacity = 1;
-            //        }
-            //    }));
         }
-
-        //private void OnCalculationFinished(object sender, string t)
-        //{
-        //}
-
 
         private void cancelEditsButton_Click(object sender, RoutedEventArgs e)
         {
@@ -199,7 +166,6 @@ namespace NoiseMapper
             this.ClearResults();
 
             var _ = RunCalcAsync();
-            //RunCalcAsync();
         }
 
         private void FeatureLayer_MouseLeftButtonUp(object sender, GraphicMouseButtonEventArgs e)
@@ -222,8 +188,6 @@ namespace NoiseMapper
         {
             GraphicsLayer resultsGraphicsLayer = map.Layers["results"] as GraphicsLayer;
             resultsGraphicsLayer.Graphics.Clear();
-            //resultsGraphicsLayer.Refresh(); // raczej niepotrzebne
-            //progressBar.Value = 0;
         }
 
         private async Task RunCalcAsync()
@@ -234,27 +198,19 @@ namespace NoiseMapper
 
             NoiseModelSettings noiseModelSettings = new NoiseModelSettings();
             noiseModelSettings.GridSize = gridSize;
-            //noiseModelSettings.GridSize = int.Parse(gridSizeTextBox.Text);
             noiseModelSettings.GridHeight = int.Parse(gridHeightTextBox.Text);
             noiseModelSettings.SpatialReference = map.SpatialReference;
             noiseModelSettings.MinimumValue = 30;
 
             NoiseModel noiseModel = new NoiseModel(noiseModelSettings);
-            //noiseModel.ModelPrepared += OnModelPrepared;
-            //noiseModel.ProgressIncremented += OnProgressIncremented;
-            //noiseModel.CalcFinished += OnCalculationFinished;
 
             noiseModel.SourceCollection = ImportSources("sources");
             noiseModel.CalcAreaCollection = ImportCalcAreas("calcAreas");
-
-            //this.ShowProgressBar();
 
             await Task.Run(() =>
             {
                 noiseModel.RunCalc();
             });
-
-            //this.HideProgressBar();
 
             List<Graphic> graphicCollection = new List<Graphic>(noiseModel.CalcPointCollection.Count);
 
@@ -303,8 +259,6 @@ namespace NoiseMapper
 
         private void ShowProgressBar()
         {
-            //progressBar.Opacity = 0;
-            //progressBar.IsIndeterminate = false;
             progressBar.Visibility = System.Windows.Visibility.Visible;
         }
 

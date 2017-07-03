@@ -2,9 +2,11 @@
 
 namespace NoiseMapper.Model
 {
+    /// <summary>
+    /// Parent of all point-type model objects
+    ///</summary>
     public abstract class PointModelObject : ModelObject
     {
-
         public PointModelObject(esriGeometry.MapPoint mapPoint)
             :base(mapPoint) {}
 

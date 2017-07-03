@@ -2,7 +2,11 @@
 
 namespace NoiseMapper.Model
 {
+    /// <summary>
+    /// Class for storing point sources
+    ///</summary>
     class PointSource : PointModelObject
+
     {
         #region CONSTRUCTOR
 

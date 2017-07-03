@@ -3,6 +3,9 @@
 namespace NoiseMapper.Model
 {
     public class NoiseModelSettings
+    /// <summary>
+    /// Class to store Noise Model Settings
+    ///</summary>
     {
         public NoiseModelSettings()
         {

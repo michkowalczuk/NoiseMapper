@@ -2,9 +2,9 @@
 
 namespace NoiseMapper.Model
 {
-    // delegate type
-    //public delegate void LDWChangeDelegate(object sender, double ldw);
-
+    /// <summary>
+    /// Class for calculation points
+    ///</summary>
     public class CalcPoint : PointModelObject
     {
         # region CONSTRUCTOR
@@ -14,30 +14,9 @@ namespace NoiseMapper.Model
 
         #endregion
 
-
-        #region FIELDS
-
-        //private double ldw;
-
-        #endregion
-
-        // delegates
-        //public static LDWChangeDelegate LDWChange { get; set; }
-
         #region PEOPERTIES
 
         public double LDW { get; set; }
-        //{
-        //    get { return ldw; }
-        //    set 
-        //    {
-        //        ldw = value;
-        //        if (LDWChange != null)
-        //        {
-        //            LDWChange(this, ldw);
-        //        }
-        //    }
-        //}
 
         public esriGeometry.Polygon Tile { get; set; }
 

@@ -3,6 +3,9 @@ using esriGeometry = ESRI.ArcGIS.Client.Geometry;
 
 namespace NoiseMapper.Tools
 {
+    /// <summary>
+    /// Class with static methods for geometry calculations
+    ///</summary>
     class Geometry
     {
         public static double Distance2D(esriGeometry.MapPoint point1, esriGeometry.MapPoint point2)

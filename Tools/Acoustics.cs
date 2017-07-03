@@ -4,6 +4,9 @@ using System.Linq;
 
 namespace NoiseMapper.Tools
 {
+    /// <summary>
+    /// Class with static methods for acoustic calculations
+    ///</summary>
     class Acoustics
     {
         internal static double Log10Sum(List<double> levelCollection)
