@@ -1,5 +1,5 @@
 # NoiseMapper
-NoiseMapperApp is a simple noise mapping desktop app created for [*ArcGIS Online Spring Developers*](https://www.facebook.com/esripolska/photos/a.161362313904993/677058779002008/?type=3) competition organized by ESRI Polska Sp. z o.o. in 2014 and ranked 2nd best application. It's C# desktop application based on ArcGIS Runtime SDK for WPF.
+NoiseMapperApp is a simple noise mapping desktop application created for [*ArcGIS Online Spring Developers*](https://www.facebook.com/esripolska/photos/a.161362313904993/677058779002008/?type=3) competition organized by ESRI Polska Sp. z o.o. in 2014 and ranked 2nd best application. It's C# desktop application based on ArcGIS Runtime SDK for WPF.
 
 To run you need ArcGIS Runtime SDK 10.2.3 for WPF from [here](http://resources.arcgis.com/en/communities/runtime-wpf/) and Microsft Visual Studio 2010 SP1 / 2012 / 2013.
 
